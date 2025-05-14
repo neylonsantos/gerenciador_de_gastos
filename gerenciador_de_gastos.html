@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Gastos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .max-height-400 {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        body {
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="text-center text-primary">Gerenciador de Gastos</h1>
+        <a href="http://neylon.xyz/"><p class="text-center mb-5 text-primary">By Neylon Santos</p></a>
+
+        <div class="row g-4">
+            <div class="col-md-5">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h5 mb-0">Adicionar Novo Gasto</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descrição:</label>
+                            <input type="text" class="form-control" id="description" placeholder="Ex: Conta de luz">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Valor (R$):</label>
+                            <input type="number" class="form-control" id="amount" placeholder="100.00" step="0.01" min="0">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Categoria:</label>
+                            <select class="form-select" id="category">
+                                <option value="">Selecione uma categoria</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label d-block">Frequência:</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="frequency" id="monthly" value="monthly" checked>
+                                <label class="form-check-label" for="monthly">Mensal</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="frequency" id="annual" value="annual">
+                                <label class="form-check-label" for="annual">Anual</label>
+                            </div>
+                        </div>
+
+                        <button id="addExpense" class="btn btn-primary w-100">Adicionar Gasto</button>
+                    </div>
+                </div>
+
+                <div class="card shadow mt-4">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="h5 mb-0">Adicionar Nova Categoria</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="newCategory" placeholder="Nome da categoria">
+                            <button class="btn btn-success" id="addCategory">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow mt-4">
+                    <div class="card-header bg-danger text-white">
+                        <h2 class="h5 mb-0">Apagar Dados</h2>
+                    </div>
+                    <div class="card-body">
+                        <button id="clearData" class="btn btn-danger w-100">Apagar Todos os Dados</button>
+                        <small class="text-muted d-block mt-2">Esta ação irá apagar todos os gastos e categorias personalizadas.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="h5 mb-0">Resumo Mensal</h2>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="display-6 text-success mb-4" id="monthlyTotal">R$ 0.00</h3>
+
+                        <h4 class="h6">Gastos por Categoria (Mensal):</h4>
+                        <div id="categoryTotals" class="mb-0">
+                            <p class="text-muted">Adicione gastos para ver o resumo por categoria.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="h5 mb-0">Lista de Gastos</h2>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive max-height-400">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Descrição</th>
+                                        <th>Valor</th>
+                                        <th>Categoria</th>
+                                        <th>Freq.</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expensesList">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Nenhum gasto adicionado ainda.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados iniciais
+        let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+        let categories = JSON.parse(localStorage.getItem('categories')) || ['Alimentação', 'Moradia', 'Transporte', 'Lazer', 'Saúde'];
+
+        // Elementos DOM
+        const descriptionInput = document.getElementById('description');
+        const amountInput = document.getElementById('amount');
+        const categorySelect = document.getElementById('category');
+        const monthlyRadio = document.getElementById('monthly');
+        const annualRadio = document.getElementById('annual');
+        const addExpenseBtn = document.getElementById('addExpense');
+        const newCategoryInput = document.getElementById('newCategory');
+        const addCategoryBtn = document.getElementById('addCategory');
+        const clearDataBtn = document.getElementById('clearData');
+        const expensesListEl = document.getElementById('expensesList');
+        const monthlyTotalEl = document.getElementById('monthlyTotal');
+        const categoryTotalsEl = document.getElementById('categoryTotals');
+
+        // Funções
+        function saveToLocalStorage() {
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            localStorage.setItem('categories', JSON.stringify(categories));
+        }
+
+        function updateCategorySelect() {
+            categorySelect.innerHTML = '<option value="">Selecione uma categoria</option>';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        function calculateMonthlyTotal() {
+            return expenses.reduce((total, expense) => {
+                const monthlyAmount = expense.frequency === 'monthly'
+                    ? expense.amount
+                    : expense.amount / 12;
+                return total + monthlyAmount;
+            }, 0);
+        }
+
+        function calculateCategoryTotals() {
+            const totals = {};
+
+            categories.forEach(cat => {
+                totals[cat] = { monthly: 0, annual: 0 };
+            });
+
+            expenses.forEach(expense => {
+                if (!totals[expense.category]) return;
+
+                if (expense.frequency === 'monthly') {
+                    totals[expense.category].monthly += expense.amount;
+                    totals[expense.category].annual += expense.amount * 12;
+                } else {
+                    totals[expense.category].annual += expense.amount;
+                    totals[expense.category].monthly += expense.amount / 12;
+                }
+            });
+
+            return totals;
+        }
+
+        function updateExpensesList() {
+            if (expenses.length === 0) {
+                expensesListEl.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Nenhum gasto adicionado ainda.</td></tr>';
+                return;
+            }
+
+            expensesListEl.innerHTML = '';
+            expenses.forEach(expense => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${expense.description}</td>
+                    <td>R$ ${expense.amount.toFixed(2)}</td>
+                    <td>${expense.category}</td>
+                    <td>${expense.frequency === 'monthly' ? 'Mensal' : 'Anual'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger delete-expense" data-id="${expense.id}">
+                            Excluir
+                        </button>
+                    </td>
+                `;
+                expensesListEl.appendChild(row);
+            });
+
+            // Adicionar eventos de exclusão
+            document.querySelectorAll('.delete-expense').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    deleteExpense(id);
+                });
+            });
+        }
+
+        function updateSummary() {
+            const monthlyTotal = calculateMonthlyTotal();
+            monthlyTotalEl.textContent = `R$ ${monthlyTotal.toFixed(2)}`;
+
+            const categoryTotals = calculateCategoryTotals();
+            let html = '';
+
+            let hasValues = false;
+            for (const [category, values] of Object.entries(categoryTotals)) {
+                if (values.monthly > 0) {
+                    hasValues = true;
+                    html += `
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>${category}:</span>
+                            <span class="fw-medium">R$ ${values.monthly.toFixed(2)}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            if (!hasValues) {
+                html = '<p class="text-muted">Adicione gastos para ver o resumo por categoria.</p>';
+            }
+
+            categoryTotalsEl.innerHTML = html;
+        }
+
+        function addExpense() {
+            const description = descriptionInput.value.trim();
+            const amountStr = amountInput.value.trim();
+            const category = categorySelect.value;
+            const frequency = monthlyRadio.checked ? 'monthly' : 'annual';
+
+            if (!description || !amountStr || !category) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+
+            const amount = parseFloat(amountStr);
+            if (isNaN(amount) || amount <= 0) {
+                alert('Por favor, insira um valor válido!');
+                return;
+            }
+
+            const newExpense = {
+                id: Date.now(),
+                description,
+                amount,
+                category,
+                frequency,
+                date: new Date().toLocaleDateString('pt-BR')
+            };
+
+            expenses.push(newExpense);
+            saveToLocalStorage();
+
+            // Limpar campos
+            descriptionInput.value = '';
+            amountInput.value = '';
+            categorySelect.value = '';
+
+            updateExpensesList();
+            updateSummary();
+        }
+
+        function addCategory() {
+            const newCategory = newCategoryInput.value.trim();
+
+            if (!newCategory) {
+                alert('Por favor, insira um nome para a categoria!');
+                return;
+            }
+
+            if (categories.includes(newCategory)) {
+                alert('Esta categoria já existe!');
+                return;
+            }
+
+            categories.push(newCategory);
+            saveToLocalStorage();
+            updateCategorySelect();
+
+            newCategoryInput.value = '';
+        }
+
+        function deleteExpense(id) {
+            expenses = expenses.filter(expense => expense.id !== id);
+            saveToLocalStorage();
+            updateExpensesList();
+            updateSummary();
+        }
+
+        function clearAllData() {
+            if (confirm("Tem certeza que deseja apagar todos os dados? Esta ação não pode ser desfeita.")) {
+                // Limpa os arrays de dados
+                expenses = [];
+                categories = ['Alimentação', 'Moradia', 'Transporte', 'Lazer', 'Saúde']; // Restaura categorias padrão
+
+                // Remove do localStorage
+                localStorage.removeItem('expenses');
+                localStorage.removeItem('categories');
+
+                // Atualiza a interface
+                updateCategorySelect();
+                updateExpensesList();
+                updateSummary();
+
+                alert("Todos os dados foram apagados com sucesso!");
+            }
+        }
+
+        // Inicialização
+        function init() {
+            updateCategorySelect();
+            updateExpensesList();
+            updateSummary();
+
+            // Event listeners
+            addExpenseBtn.addEventListener('click', addExpense);
+            addCategoryBtn.addEventListener('click', addCategory);
+            clearDataBtn.addEventListener('click', clearAllData);
+        }
+
+        // Iniciar aplicação
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
