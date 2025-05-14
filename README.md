@@ -1,6 +1,6 @@
 Aqui está um exemplo de README para o seu projeto **Gerenciador de Gastos**:
 
-```markdown
+
 # Gerenciador de Gastos
 
 O **Gerenciador de Gastos** é uma aplicação web simples, desenvolvida em HTML, com o objetivo de ajudar os usuários a organizarem e monitorarem suas finanças de forma prática e eficiente.
@@ -34,6 +34,3 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 ---
 
 Desenvolvido por [@neylonsantos](https://github.com/neylonsantos).
-```
-
-Você pode personalizar conforme a evolução do projeto e incluir mais detalhes, como screenshots e funcionalidades adicionais.
