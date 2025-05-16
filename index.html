@@ -131,11 +131,9 @@
     </div>
 
     <script>
-        // Dados iniciais
         let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
         let categories = JSON.parse(localStorage.getItem('categories')) || ['Alimentação', 'Moradia', 'Transporte', 'Lazer', 'Saúde'];
 
-        // Elementos DOM
         const descriptionInput = document.getElementById('description');
         const amountInput = document.getElementById('amount');
         const categorySelect = document.getElementById('category');
@@ -149,7 +147,6 @@
         const monthlyTotalEl = document.getElementById('monthlyTotal');
         const categoryTotalsEl = document.getElementById('categoryTotals');
 
-        // Funções
         function saveToLocalStorage() {
             localStorage.setItem('expenses', JSON.stringify(expenses));
             localStorage.setItem('categories', JSON.stringify(categories));
@@ -219,7 +216,6 @@
                 expensesListEl.appendChild(row);
             });
 
-            // Adicionar eventos de exclusão
             document.querySelectorAll('.delete-expense').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const id = parseInt(this.getAttribute('data-id'));
@@ -284,7 +280,6 @@
             expenses.push(newExpense);
             saveToLocalStorage();
 
-            // Limpar campos
             descriptionInput.value = '';
             amountInput.value = '';
             categorySelect.value = '';
@@ -322,15 +317,12 @@
 
         function clearAllData() {
             if (confirm("Tem certeza que deseja apagar todos os dados? Esta ação não pode ser desfeita.")) {
-                // Limpa os arrays de dados
                 expenses = [];
                 categories = ['Alimentação', 'Moradia', 'Transporte', 'Lazer', 'Saúde']; // Restaura categorias padrão
 
-                // Remove do localStorage
                 localStorage.removeItem('expenses');
                 localStorage.removeItem('categories');
 
-                // Atualiza a interface
                 updateCategorySelect();
                 updateExpensesList();
                 updateSummary();
@@ -339,19 +331,16 @@
             }
         }
 
-        // Inicialização
         function init() {
             updateCategorySelect();
             updateExpensesList();
             updateSummary();
 
-            // Event listeners
             addExpenseBtn.addEventListener('click', addExpense);
             addCategoryBtn.addEventListener('click', addCategory);
             clearDataBtn.addEventListener('click', clearAllData);
         }
 
-        // Iniciar aplicação
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
