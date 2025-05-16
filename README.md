@@ -1,9 +1,6 @@
-Aqui está um exemplo de README para o seu projeto **Gerenciador de Gastos**:
+# MiniGrana
 
-
-# Gerenciador de Gastos
-
-O **Gerenciador de Gastos** é uma aplicação web simples, desenvolvida em HTML, com o objetivo de ajudar os usuários a organizarem e monitorarem suas finanças de forma prática e eficiente.
+O **MiniGrana** é uma aplicação web simples, desenvolvida em HTML, com o objetivo de ajudar os usuários a organizarem e monitorarem suas finanças de forma prática e eficiente.
 
 ## Funcionalidades
 
@@ -19,7 +16,7 @@ O **Gerenciador de Gastos** é uma aplicação web simples, desenvolvida em HTML
 
 1. Clone este repositório:
    ```bash
-   git clone https://github.com/neylonsantos/gerenciador_de_gastos.git
+   git clone https://github.com/neylonsantos/minigrana.git
    ```
 2. Abra o arquivo `index.html` no navegador de sua preferência.
 
